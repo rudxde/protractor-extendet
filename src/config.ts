@@ -1,0 +1,1 @@
+export let DEFAULT_WAIT_TIME = 500;

@@ -1,0 +1,21 @@
+{
+  "name": "protractor-ext",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/src/index",
+  "types": "dist/src/index",
+  "scripts": {
+    "build": "tsc -p .",
+    "lint": "tslint -t codeFrame 'src/**/*.ts' 'test/**/*.ts'"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.12.7",
+    "typescript": "^3.7.2",
+    "tslint": "~5.20.1"
+  },
+  "dependencies": {
+    "protractor": "^5.4.2"
+  }
+}
