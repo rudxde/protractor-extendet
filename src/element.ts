@@ -44,6 +44,8 @@ export class Element {
         })());
     }
 
+    async text(): Promise<string> {
+        return await this.protractorElementFinder.getText()
     }
 
 }
@@ -80,6 +82,10 @@ export class ElementPromise implements Promise<Element>, Element {
         return new ElementPromise((async () => {
             return (await this).wait(waitFor, timeOut);
         })());
+    }
+
+    async text(): Promise<string> {
+        return (await this).text();
     }
 
     then<TResult1 = Browser, TResult2 = never>(onfulfilled?: (value: Element) => TResult1 | PromiseLike<TResult1>, onrejected?: (reason: any) => TResult2 | PromiseLike<TResult2>): Promise<TResult1 | TResult2> {
