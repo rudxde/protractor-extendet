@@ -1,7 +1,7 @@
 import { Browser } from "./browser";
 import { ElementFinder } from "protractor";
 import { ElementArray, ElementArrayPromise } from "./element-array";
-import { WaitFor } from "./wait-for";
+import { WaitFor, waiter } from "./wait-for";
 
 export class Element {
     static ByCss(browser: Browser, cssSelector: string, parent?: Element): Element {
@@ -11,6 +11,7 @@ export class Element {
             return new Element(browser, browser.protractorBrowser.$(cssSelector));
         }
     }
+
     constructor(
         public browser: Browser,
         public protractorElementFinder: ElementFinder,
@@ -36,11 +37,13 @@ export class Element {
         })());
     }
 
-    wait(waitFor: WaitFor<Element>): ElementPromise {
+    wait(waitFor: WaitFor<Element>, timeOut?: number): ElementPromise {
         return new ElementPromise((async () => {
-            await waitFor(this);
+            await waiter(this, waitFor, timeOut);
             return this;
         })());
+    }
+
     }
 
 }
@@ -73,9 +76,9 @@ export class ElementPromise implements Promise<Element>, Element {
         })());
     }
 
-    wait(waitFor: WaitFor<Element>): ElementPromise {
+    wait(waitFor: WaitFor<Element>, timeOut?: number): ElementPromise {
         return new ElementPromise((async () => {
-            return (await this).wait(waitFor);
+            return (await this).wait(waitFor, timeOut);
         })());
     }
 

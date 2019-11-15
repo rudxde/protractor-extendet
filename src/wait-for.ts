@@ -2,8 +2,21 @@ import { Element } from './element';
 import { ExpectedConditions } from 'protractor';
 import { Browser } from './browser';
 import { ElementArray } from './element-array';
+import { DEFAULT_WAIT_TIME } from './config';
 
 export type WaitFor<T> = (element: T) => Promise<void>;
+
+export function waiter<T>(element: T, waitFor: WaitFor<T>, timeOut: number = DEFAULT_WAIT_TIME): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const timeOutTimer = setTimeout(() => {
+            reject(new Error(`wait Timed out after ${timeOut} ms.`));
+        }, timeOut);
+        waitFor(element).then(() => {
+            clearTimeout(timeOutTimer);
+            resolve();
+        })
+    });
+}
 
 export const Clickable = async (element: Element | ElementArray) => {
     await element.wait(Visible);
@@ -37,16 +50,16 @@ export const Staleness = async (element: Element | ElementArray) => {
 
 export const Visible = async (element: Element | ElementArray) => {
     await element.wait(Present);
-    if(element instanceof Element) {
-    await element.browser.protractorBrowser.wait(ExpectedConditions.visibilityOf(element.protractorElementFinder));
+    if (element instanceof Element) {
+        await element.browser.protractorBrowser.wait(ExpectedConditions.visibilityOf(element.protractorElementFinder));
     } else {
         await element.map(e => e.wait(Visible));
     }
 }
 
 export const Invisible = async (element: Element | ElementArray) => {
-    if(element instanceof Element) {
-    await element.browser.protractorBrowser.wait(ExpectedConditions.invisibilityOf(element.protractorElementFinder));
+    if (element instanceof Element) {
+        await element.browser.protractorBrowser.wait(ExpectedConditions.invisibilityOf(element.protractorElementFinder));
     } else {
         await element.map(e => e.wait(Invisible));
     }

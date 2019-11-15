@@ -2,7 +2,7 @@ import { Element, ElementPromise } from "./element";
 import { ElementArrayFinder, ElementFinder } from "protractor";
 import { Browser } from "./browser";
 import { Countable } from "./countable";
-import { WaitFor } from "./wait-for";
+import { WaitFor, waiter } from "./wait-for";
 
 export class ElementArray implements Countable<ElementPromise> {
     static async ByCss(browser: Browser, cssSelector: string, parent?: Element): Promise<ElementArray> {
@@ -103,9 +103,9 @@ export class ElementArray implements Countable<ElementPromise> {
         return Promise.all(allPromises);
     }
 
-    wait(waitFor: WaitFor<ElementArray>): ElementArrayPromise {
+    wait(waitFor: WaitFor<ElementArray>, timeOut?: number): ElementArrayPromise {
         return new ElementArrayPromise((async () => {
-            await waitFor(this);
+            await waiter(this, waitFor, timeOut);
             return this;
         })());
     }
@@ -115,18 +115,21 @@ export class ElementArray implements Countable<ElementPromise> {
 
 export class ElementArrayPromise implements Promise<ElementArray>, ElementArray {
     parent?: Element = undefined;
-    get elements(): Element[] {
-        throw new Error('property can not be accessed on Promise');
-    }
-    get browser(): Browser {
-        throw new Error('property can not be accessed on Promise');
-    }
-    get protractorElementFinderArray(): ElementFinder[] {
-        throw new Error('property can not be accessed on Promise');
-    }
     constructor(
         public sourcePromise: Promise<ElementArray>
     ) {
+    }
+
+    get elements(): Element[] {
+        throw new Error('property can not be accessed on Promise');
+    }
+
+    get browser(): Browser {
+        throw new Error('property can not be accessed on Promise');
+    }
+
+    get protractorElementFinderArray(): ElementFinder[] {
+        throw new Error('property can not be accessed on Promise');
     }
 
     get(index: number): ElementPromise {
@@ -185,9 +188,9 @@ export class ElementArrayPromise implements Promise<ElementArray>, ElementArray 
         return this.then(x => x.map(fn));
     }
 
-    wait(waitFor: WaitFor<ElementArray>): ElementArrayPromise {
+    wait(waitFor: WaitFor<ElementArray>, timeOut?: number): ElementArrayPromise {
         return new ElementArrayPromise((async () => {
-            return (await this).wait(waitFor);
+            return (await this).wait(waitFor, timeOut);
         })());
     }
 
