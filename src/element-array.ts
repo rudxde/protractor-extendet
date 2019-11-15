@@ -211,3 +211,16 @@ export class ElementArrayPromise implements Promise<ElementArray>, ElementArray 
     }
 
 }
+
+export function toElementArrayPromise(elementPromises: ElementPromise[]): ElementArrayPromise {
+    return new ElementArrayPromise(
+        (async () => {
+            const allElements: Element[] = await Promise.all(elementPromises)
+            return new ElementArray(
+                allElements[0].browser,
+                allElements.map(e => e.protractorElementFinder),
+                allElements[0].parent,
+            )
+        })()
+    )
+}

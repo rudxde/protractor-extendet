@@ -15,7 +15,7 @@ export class Element {
     constructor(
         public browser: Browser,
         public protractorElementFinder: ElementFinder,
-        parent?: Element,
+        public parent?: Element,
     ) {
 
     }
