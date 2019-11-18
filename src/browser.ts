@@ -1,5 +1,4 @@
 import { browser as _protractorBrowser, ProtractorBrowser, browser } from 'protractor';
-import { async } from 'q';
 import { Element, ElementPromise } from './element';
 import { ElementArray, ElementArrayPromise } from './element-array';
 import { WaitFor, waiter } from './wait-for';
@@ -93,10 +92,28 @@ export class Browser {
         `);
     }
 
+    async readSessionStorage(item: string): Promise<string> {
+        return await browser.executeAsyncScript(`
+            return sesionStorage.getItem('${item}');
+        `) as string;
+    }
+
+    async writeSessionStorage(item: string, value: string): Promise<void> {
+        return await browser.executeAsyncScript(`
+            sesionStorage.setItem('${item}', '${value}');
+        `);
+    }
+
     wait(waitFor: WaitFor<Browser>, timeOut?: number): BrowserPromise {
         return new BrowserPromise((async () => {
             await waiter(this, waitFor, timeOut);
             return this;
+        })());
+    }
+
+    expect(waitFor: WaitFor<Browser>): BrowserPromise {
+        return new BrowserPromise((async () => {
+            return this.wait(waitFor, 0);
         })());
     }
 
@@ -156,6 +173,12 @@ export class BrowserPromise implements Promise<Browser>, Browser {
         })());
     }
 
+    expect(waitFor: WaitFor<Browser>): BrowserPromise {
+        return new BrowserPromise((async () => {
+            return (await this).expect(waitFor);
+        })());
+    }
+
     wait(waitFor: WaitFor<Browser>, timeOut?: number): BrowserPromise {
         return new BrowserPromise((async () => {
             return (await this).wait(waitFor, timeOut);
@@ -187,5 +210,13 @@ export class BrowserPromise implements Promise<Browser>, Browser {
     async writeLocalStorage(item: string, value: string): Promise<void> {
         return (await this).writeLocalStorage(item, value);
     }
+
+    async readSessionStorage(item: string): Promise<string> {
+        return (await this).readSessionStorage(item);
+    }
+    async writeSessionStorage(item: string, value: string): Promise<void> {
+        return (await this).writeSessionStorage(item, value);
+    }
+
 
 }

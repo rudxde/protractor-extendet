@@ -4,14 +4,14 @@ import { Browser } from './browser';
 import { ElementArray } from './element-array';
 import { DEFAULT_WAIT_TIME } from './config';
 
-export type WaitFor<T> = (element: T) => Promise<void>;
-
+export type WaitFor<T> = (element: T) => Promise<any>;
+export type WaitForFactory<T> = ((...args: any[]) => WaitFor<T>);
 interface PreconditionMap<T extends WaitFor<any>> extends Map<T | ((...args: any[]) => T), T[]> {
     set<K extends T>(key: (K | ((...args: any[]) => K)), value: K[]): this;
     get<K extends T>(key: (K | ((...args: any[]) => K))): K[] | undefined;
 }
 
-async function executePreconditions<T>(waitFor: WaitFor<T> | ((...args: any[]) => WaitFor<T>), element: T): Promise<void> {
+async function executePreconditions<T>(waitFor: WaitFor<T> | WaitForFactory<T>, element: T): Promise<void> {
     const waitsPres: WaitFor<T>[] = preconditions.get(waitFor) || [];
     for (let precondition of waitsPres) {
         await precondition(element);
@@ -20,7 +20,7 @@ async function executePreconditions<T>(waitFor: WaitFor<T> | ((...args: any[]) =
 
 const preconditions: PreconditionMap<WaitFor<any>> = new Map();
 
-export function setPreconditionForWait<T>(forWait: WaitFor<T>, set: WaitFor<T>): void {
+export function setPreconditionForWait<T>(forWait: WaitFor<T> | WaitForFactory<T>, set: WaitFor<T>): void {
     const existingpreconditions = preconditions.get(forWait) || [];
     preconditions.set(forWait, [...existingpreconditions, set]);
 }
@@ -129,8 +129,46 @@ export function TextToBePresentInValue(text: string): WaitFor<Element> {
     }
 }
 
+export function And<T>(a: WaitFor<T>, b: WaitFor<T>): WaitFor<T> {
+    return async (element: T) => {
+        await Promise.all([a(element), b(element)]);
+    }
+}
+export function Or<T>(a: WaitFor<T>, b: WaitFor<T>): WaitFor<T> {
+    return async (element: T) => {
+        return new Promise(resolve => {
+            a(element).then(resolve);
+            b(element).then(resolve);
+        });
+    }
+}
+
+export const DocumentReady: WaitFor<Browser> = async (element: Browser) => {
+    await element.executeScript(`
+        if (document.readyState !== 'loading') {
+            return;
+        }
+        return new Promise(resolve => {
+            document.addEventListener("DOMContentLoaded", (event) => {
+                document.removeEventListener('DOMContentLoaded');
+                resolve();
+            });
+        });
+    `);
+}
+
+export const BrowserIsReady: WaitFor<Browser> = async (element: Browser) => {
+    await element.protractorBrowser.ready;
+}
+
+
 
 setPreconditionForWait(Clickable, Visible);
 setPreconditionForWait(Visible, Present);
 setPreconditionForWait(Staleness, Invisible);
 setPreconditionForWait(Selected, Visible);
+
+setPreconditionForWait<Browser>(UrlIs, DocumentReady);
+setPreconditionForWait<Browser>(UrlContain, DocumentReady);
+setPreconditionForWait<Browser>(TitleIs, DocumentReady);
+setPreconditionForWait<Browser>(TitleContain, DocumentReady);

@@ -1,5 +1,5 @@
 import { Browser } from "./browser";
-import { ElementFinder } from "protractor";
+import { ElementFinder, by } from "protractor";
 import { ElementArray, ElementArrayPromise } from "./element-array";
 import { WaitFor, waiter } from "./wait-for";
 
@@ -48,6 +48,37 @@ export class Element {
         return await this.protractorElementFinder.getText()
     }
 
+    async attribute(name: string): Promise<string> {
+        return await this.protractorElementFinder.getAttribute(name);
+    }
+
+    async value(): Promise<string> {
+        return await this.protractorElementFinder.getAttribute('value');
+    }
+
+    async cssClasss(): Promise<string[]> {
+        return await this.protractorElementFinder.getAttribute('class').then(x => x.split(' '));
+    }
+
+    directParent(): ElementPromise {
+        return new ElementPromise((async () => {
+            return new Element(this.browser, this.protractorElementFinder.element(by.xpath('..')));
+        })());
+    }
+
+    sendKeys(...var_args: Array<string | number | Promise<string | number>>): ElementPromise {
+        return new ElementPromise((async () => {
+            await this.protractorElementFinder.sendKeys(...var_args);
+            return this;
+        })());
+    }
+
+    expect(waitFor: WaitFor<Element>): ElementPromise {
+        return new ElementPromise((async () => {
+            return this.wait(waitFor, 0);
+        })());
+    }
+
 }
 
 export class ElementPromise implements Promise<Element>, Element {
@@ -84,8 +115,38 @@ export class ElementPromise implements Promise<Element>, Element {
         })());
     }
 
+    expect(waitFor: WaitFor<Element>): ElementPromise {
+        return new ElementPromise((async () => {
+            return (await this).expect(waitFor);
+        })());
+    }
+
     async text(): Promise<string> {
         return (await this).text();
+    }
+
+    async attribute(name: string): Promise<string> {
+        return (await this).attribute(name);
+    }
+
+    async value(): Promise<string> {
+        return (await this).value();
+    }
+
+    async cssClasss(): Promise<string[]> {
+        return (await this).cssClasss();
+    }
+
+    sendKeys(...var_args: Array<string | number | Promise<string | number>>): ElementPromise {
+        return new ElementPromise((async () => {
+           return (await this).sendKeys(...var_args);
+        })());
+    }
+
+    directParent(): ElementPromise {
+        return new ElementPromise((async () => {
+            return (await this).directParent();
+        })());
     }
 
     then<TResult1 = Browser, TResult2 = never>(onfulfilled?: (value: Element) => TResult1 | PromiseLike<TResult1>, onrejected?: (reason: any) => TResult2 | PromiseLike<TResult2>): Promise<TResult1 | TResult2> {
@@ -103,6 +164,4 @@ export class ElementPromise implements Promise<Element>, Element {
             return this.sourcePromise.finally(onfinally);
         })());
     }
-
-
 }

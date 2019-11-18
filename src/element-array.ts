@@ -110,6 +110,12 @@ export class ElementArray implements Countable<ElementPromise> {
         })());
     }
 
+    expect(waitFor: WaitFor<ElementArray>): ElementArrayPromise {
+        return new ElementArrayPromise((async () => {
+            return this.wait(waitFor, 0);
+        })());
+    }
+
 }
 
 
@@ -191,6 +197,12 @@ export class ElementArrayPromise implements Promise<ElementArray>, ElementArray 
     wait(waitFor: WaitFor<ElementArray>, timeOut?: number): ElementArrayPromise {
         return new ElementArrayPromise((async () => {
             return (await this).wait(waitFor, timeOut);
+        })());
+    }
+
+    expect(waitFor: WaitFor<ElementArray>): ElementArrayPromise {
+        return new ElementArrayPromise((async () => {
+            return (await this).expect(waitFor);
         })());
     }
 
