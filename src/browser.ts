@@ -13,7 +13,7 @@ export class Browser {
     isTerminated: boolean = false;
 
     constructor(
-        public protractorBrowser: ProtractorBrowser = _protractorBrowser,
+        public __protractorBrowser: ProtractorBrowser = _protractorBrowser,
     ) {
 
     }
@@ -28,7 +28,7 @@ export class Browser {
     restart(): BrowserPromise {
         return new BrowserPromise((async () => {
             Browser.allBrowsers = Browser.allBrowsers.filter(x => x !== this);
-            const result: Browser = new Browser(await this.protractorBrowser.restart());
+            const result: Browser = new Browser(await this.__protractorBrowser.restart());
             this.isTerminated = true;
             Browser.allBrowsers.push(result);
             return result;
@@ -37,7 +37,7 @@ export class Browser {
 
     fork(useSameUrl?: boolean, copyMockModules?: boolean, copyConfigUpdates?: boolean): BrowserPromise {
         return new BrowserPromise((async () => {
-            const result = new Browser(await this.protractorBrowser.forkNewDriverInstance(useSameUrl, copyMockModules, copyConfigUpdates).ready);
+            const result = new Browser(await this.__protractorBrowser.forkNewDriverInstance(useSameUrl, copyMockModules, copyConfigUpdates).ready);
             Browser.allBrowsers.push(result);
             return result;
         })());
@@ -57,7 +57,7 @@ export class Browser {
 
     async close(): Promise<void> {
         Browser.allBrowsers = Browser.allBrowsers.filter(x => x !== this);
-        await this.protractorBrowser.close();
+        await this.__protractorBrowser.close();
     }
 
     async executeScript<T>(code: string): Promise<T> {
@@ -130,7 +130,7 @@ export class BrowserPromise implements Promise<Browser>, Browser {
         throw new Error('property can not be accessed on Promise');
     }
 
-    get protractorBrowser(): ProtractorBrowser {
+    get __protractorBrowser(): ProtractorBrowser {
         throw new Error('property can not be accessed on Promise');
     }
 

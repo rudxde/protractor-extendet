@@ -6,15 +6,15 @@ import { WaitFor, waiter } from "./wait-for";
 export class Element {
     static ByCss(browser: Browser, cssSelector: string, parent?: Element): Element {
         if (parent) {
-            return new Element(browser, parent.protractorElementFinder.$(cssSelector), parent);
+            return new Element(browser, parent.__protractorElementFinder.$(cssSelector), parent);
         } else {
-            return new Element(browser, browser.protractorBrowser.$(cssSelector));
+            return new Element(browser, browser.__protractorBrowser.$(cssSelector));
         }
     }
 
     constructor(
         public browser: Browser,
-        public protractorElementFinder: ElementFinder,
+        public __protractorElementFinder: ElementFinder,
         public parent?: Element,
     ) {
 
@@ -32,7 +32,7 @@ export class Element {
 
     click(): ElementPromise {
         return new ElementPromise((async () => {
-            await this.protractorElementFinder.click();
+            await this.__protractorElementFinder.click();
             return this;
         })());
     }
@@ -45,30 +45,30 @@ export class Element {
     }
 
     async text(): Promise<string> {
-        return await this.protractorElementFinder.getText()
+        return await this.__protractorElementFinder.getText()
     }
 
     async attribute(name: string): Promise<string> {
-        return await this.protractorElementFinder.getAttribute(name);
+        return await this.__protractorElementFinder.getAttribute(name);
     }
 
     async value(): Promise<string> {
-        return await this.protractorElementFinder.getAttribute('value');
+        return await this.__protractorElementFinder.getAttribute('value');
     }
 
     async cssClasss(): Promise<string[]> {
-        return await this.protractorElementFinder.getAttribute('class').then(x => x.split(' '));
+        return await this.__protractorElementFinder.getAttribute('class').then(x => x.split(' '));
     }
 
     directParent(): ElementPromise {
         return new ElementPromise((async () => {
-            return new Element(this.browser, this.protractorElementFinder.element(by.xpath('..')));
+            return new Element(this.browser, this.__protractorElementFinder.element(by.xpath('..')));
         })());
     }
 
     sendKeys(...var_args: Array<string | number | Promise<string | number>>): ElementPromise {
         return new ElementPromise((async () => {
-            await this.protractorElementFinder.sendKeys(...var_args);
+            await this.__protractorElementFinder.sendKeys(...var_args);
             return this;
         })());
     }
@@ -85,7 +85,7 @@ export class ElementPromise implements Promise<Element>, Element {
     get browser(): Browser {
         throw new Error('property can not be accessed on Promise');
     }
-    get protractorElementFinder(): ElementFinder {
+    get __protractorElementFinder(): ElementFinder {
         throw new Error('property can not be accessed on Promise');
     }
     constructor(

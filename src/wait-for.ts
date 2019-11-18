@@ -40,7 +40,7 @@ export function waiter<T>(element: T, waitFor: WaitFor<T>, timeOut: number = DEF
 export const Clickable = async (element: Element | ElementArray) => {
     await executePreconditions(Clickable, element);
     if (element instanceof Element) {
-        await element.browser.protractorBrowser.wait(ExpectedConditions.elementToBeClickable(element.protractorElementFinder));
+        await element.browser.__protractorBrowser.wait(ExpectedConditions.elementToBeClickable(element.__protractorElementFinder));
     } else {
         await element.map(e => e.wait(Clickable));
     }
@@ -48,13 +48,13 @@ export const Clickable = async (element: Element | ElementArray) => {
 
 export const Selected = async (element: Element) => {
     await executePreconditions(Selected, element);
-    await element.browser.protractorBrowser.wait(ExpectedConditions.elementToBeClickable(element.protractorElementFinder));
+    await element.browser.__protractorBrowser.wait(ExpectedConditions.elementToBeClickable(element.__protractorElementFinder));
 }
 
 export const Present = async (element: Element | ElementArray) => {
     await executePreconditions(Present, element);
     if (element instanceof Element) {
-        await element.browser.protractorBrowser.wait(ExpectedConditions.presenceOf(element.protractorElementFinder));
+        await element.browser.__protractorBrowser.wait(ExpectedConditions.presenceOf(element.__protractorElementFinder));
     } else {
         await element.map(e => e.wait(Present));
     }
@@ -63,7 +63,7 @@ export const Present = async (element: Element | ElementArray) => {
 export const Staleness = async (element: Element | ElementArray) => {
     await executePreconditions(Staleness, element);
     if (element instanceof Element) {
-        await element.browser.protractorBrowser.wait(ExpectedConditions.stalenessOf(element.protractorElementFinder));
+        await element.browser.__protractorBrowser.wait(ExpectedConditions.stalenessOf(element.__protractorElementFinder));
     } else {
         await element.map(e => e.wait(Staleness));
     }
@@ -72,7 +72,7 @@ export const Staleness = async (element: Element | ElementArray) => {
 export const Visible = async (element: Element | ElementArray) => {
     await executePreconditions(Visible, element);
     if (element instanceof Element) {
-        await element.browser.protractorBrowser.wait(ExpectedConditions.visibilityOf(element.protractorElementFinder));
+        await element.browser.__protractorBrowser.wait(ExpectedConditions.visibilityOf(element.__protractorElementFinder));
     } else {
         await element.map(e => e.wait(Visible));
     }
@@ -81,7 +81,7 @@ export const Visible = async (element: Element | ElementArray) => {
 export const Invisible = async (element: Element | ElementArray) => {
     await executePreconditions(Invisible, element);
     if (element instanceof Element) {
-        await element.browser.protractorBrowser.wait(ExpectedConditions.invisibilityOf(element.protractorElementFinder));
+        await element.browser.__protractorBrowser.wait(ExpectedConditions.invisibilityOf(element.__protractorElementFinder));
     } else {
         await element.map(e => e.wait(Invisible));
     }
@@ -90,42 +90,42 @@ export const Invisible = async (element: Element | ElementArray) => {
 export function TitleContain(text: string): WaitFor<Browser> {
     return async (element: Browser) => {
         await executePreconditions<Browser>(TitleContain, element);
-        await element.protractorBrowser.wait(ExpectedConditions.titleContains(text));
+        await element.__protractorBrowser.wait(ExpectedConditions.titleContains(text));
     }
 }
 
 export function TitleIs(text: string): WaitFor<Browser> {
     return async (element: Browser) => {
         await executePreconditions<Browser>(TitleIs, element);
-        await element.protractorBrowser.wait(ExpectedConditions.titleIs(text));
+        await element.__protractorBrowser.wait(ExpectedConditions.titleIs(text));
     }
 }
 
 export function UrlContain(text: string): WaitFor<Browser> {
     return async (element: Browser) => {
         await executePreconditions<Browser>(UrlContain, element);
-        await element.protractorBrowser.wait(ExpectedConditions.urlContains(text));
+        await element.__protractorBrowser.wait(ExpectedConditions.urlContains(text));
     }
 }
 
 export function UrlIs(text: string): WaitFor<Browser> {
     return async (element: Browser) => {
         await executePreconditions<Browser>(UrlIs, element);
-        await element.protractorBrowser.wait(ExpectedConditions.urlIs(text));
+        await element.__protractorBrowser.wait(ExpectedConditions.urlIs(text));
     }
 }
 
 export function TextToBePresent(text: string): WaitFor<Element> {
     return async (element: Element) => {
         await executePreconditions<Element>(TextToBePresent, element);
-        await element.browser.protractorBrowser.wait(ExpectedConditions.textToBePresentInElement(element.protractorElementFinder, text));
+        await element.browser.__protractorBrowser.wait(ExpectedConditions.textToBePresentInElement(element.__protractorElementFinder, text));
     }
 }
 
 export function TextToBePresentInValue(text: string): WaitFor<Element> {
     return async (element: Element) => {
         await executePreconditions<Element>(TextToBePresentInValue, element);
-        await element.browser.protractorBrowser.wait(ExpectedConditions.textToBePresentInElementValue(element.protractorElementFinder, text));
+        await element.browser.__protractorBrowser.wait(ExpectedConditions.textToBePresentInElementValue(element.__protractorElementFinder, text));
     }
 }
 
@@ -158,7 +158,7 @@ export const DocumentReady: WaitFor<Browser> = async (element: Browser) => {
 }
 
 export const BrowserIsReady: WaitFor<Browser> = async (element: Browser) => {
-    await element.protractorBrowser.ready;
+    await element.__protractorBrowser.ready;
 }
 
 

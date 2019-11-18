@@ -7,8 +7,8 @@ import { WaitFor, waiter } from "./wait-for";
 export class ElementArray implements Countable<ElementPromise> {
     static async ByCss(browser: Browser, cssSelector: string, parent?: Element): Promise<ElementArray> {
         const protractorElementArrayFinder = parent ?
-            parent.protractorElementFinder.$$(cssSelector) :
-            browser.protractorBrowser.$$(cssSelector);
+            parent.__protractorElementFinder.$$(cssSelector) :
+            browser.__protractorBrowser.$$(cssSelector);
         const elementFinderArray: ElementFinder[] = [];
         for (let i = 0; i < await protractorElementArrayFinder.count(); i++) {
             elementFinderArray.push(protractorElementArrayFinder.get(i));
@@ -19,6 +19,7 @@ export class ElementArray implements Countable<ElementPromise> {
             return new ElementArray(browser, elementFinderArray);
         }
     }
+
     elements: Element[] = [];
 
     constructor(
@@ -67,7 +68,7 @@ export class ElementArray implements Countable<ElementPromise> {
                 );
             }
             const filteredElements = await Promise.all(allPromises).then(x => x.filter(Boolean)) as Element[];
-            return new ElementArray(this.browser, filteredElements.map(x => x.protractorElementFinder), this.parent);
+            return new ElementArray(this.browser, filteredElements.map(x => x.__protractorElementFinder), this.parent);
         })());
     }
 
@@ -230,7 +231,7 @@ export function toElementArrayPromise(elementPromises: ElementPromise[]): Elemen
             const allElements: Element[] = await Promise.all(elementPromises)
             return new ElementArray(
                 allElements[0].browser,
-                allElements.map(e => e.protractorElementFinder),
+                allElements.map(e => e.__protractorElementFinder),
                 allElements[0].parent,
             )
         })()
