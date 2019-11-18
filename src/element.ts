@@ -2,6 +2,7 @@ import { Browser } from "./browser";
 import { ElementFinder, by } from "protractor";
 import { ElementArray, ElementArrayPromise } from "./element-array";
 import { WaitFor, waiter } from "./wait-for";
+import { Key } from "./keys";
 
 export class Element {
     static ByCss(browser: Browser, cssSelector: string, parent?: Element): Element {
@@ -73,6 +74,23 @@ export class Element {
         })());
     }
 
+    clearValue(): ElementPromise {
+        return new ElementPromise((async () => {
+            await this.__protractorElementFinder.clear();
+            return this;
+        })());
+    }
+
+    clearText(): ElementPromise {
+        return new ElementPromise((async () => {
+            const value: string = await this.value();
+            for (let i = 0; i < value.length; i++) {
+                await this.sendKeys(Key.BACK_SPACE);
+            }
+            return this;
+        })());
+    }
+
     expect(waitFor: WaitFor<Element>): ElementPromise {
         return new ElementPromise((async () => {
             return this.wait(waitFor, 0);
@@ -139,7 +157,19 @@ export class ElementPromise implements Promise<Element>, Element {
 
     sendKeys(...var_args: Array<string | number | Promise<string | number>>): ElementPromise {
         return new ElementPromise((async () => {
-           return (await this).sendKeys(...var_args);
+            return (await this).sendKeys(...var_args);
+        })());
+    }
+
+    clearValue(): ElementPromise {
+        return new ElementPromise((async () => {
+            return (await this).clearValue();
+        })());
+    }
+
+    clearText(): ElementPromise {
+        return new ElementPromise((async () => {
+            return (await this).clearText();
         })());
     }
 

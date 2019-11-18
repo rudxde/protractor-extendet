@@ -117,6 +117,13 @@ export class Browser {
         })());
     }
 
+    sendKeys(...var_args: Array<string | Promise<string>>): BrowserPromise {
+        return new BrowserPromise((async () => {
+            await this.__protractorBrowser.actions().sendKeys(...var_args).perform();
+            return this;
+        })());
+    }
+
 }
 
 
@@ -214,9 +221,15 @@ export class BrowserPromise implements Promise<Browser>, Browser {
     async readSessionStorage(item: string): Promise<string> {
         return (await this).readSessionStorage(item);
     }
+
     async writeSessionStorage(item: string, value: string): Promise<void> {
         return (await this).writeSessionStorage(item, value);
     }
 
+    sendKeys(...var_args: Array<string | Promise<string>>): BrowserPromise {
+        return new BrowserPromise((async () => {
+            return (await this).sendKeys(...var_args);
+        })());
+    }
 
 }
